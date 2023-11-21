@@ -4,7 +4,7 @@ return {
     LrPluginName = LOC "$$$/TeamGym/PluginName=Team Gym Plugin",
     LrMetadataProvider = 'MyMetadataDefinitionFile.lua',
     LrMetadataTagsetFactory = 'MyMetadataTagset.lua',
-	VERSION = { major=0, minor=0, revision=1, },
+	VERSION = { major=0, minor=0, revision=2, },
     LrExportMenuItems = {
         title = 'Create Smart TeamGym Hierarchy',
         file = 'CreateSmartTeamGymHierarchy.lua'
