@@ -6,7 +6,21 @@ return {
     LrMetadataTagsetFactory = 'MyMetadataTagset.lua',
 	VERSION = { major=0, minor=0, revision=2, },
     LrExportMenuItems = {
-        title = 'Create Smart TeamGym Hierarchy',
-        file = 'CreateSmartTeamGymHierarchy.lua'
+        {
+            title = 'Create Smart TeamGym Hierarchy',
+            file = 'CreateSmartTeamGymHierarchy.lua'
+        },
+        {
+            title = 'Count Dividers',
+            file = 'CountDividerFrames.lua'
+        },
+        {
+            title = 'Group by Divider',
+            file = 'GroupByDivider.lua'
+        },
+        {
+            title = 'Create Rotation Groups',
+            file = 'CreateRotationGroups.lua'
+        }
     }
 }
