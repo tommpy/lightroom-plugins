@@ -1,5 +1,6 @@
 local LrDate = import "LrDate"
 local LrLogger = import "LrLogger"
+local LrApplication = import "LrApplication"
 
 local date = require("date")
 local logger = LrLogger('teamgymlog')
@@ -36,21 +37,28 @@ function PhotoUtils:sortPhotos(photos)
     return b
 end
 
-function PhotoUtils:getSelectedPhotos()
+function PhotoUtils:getSelectedSource()
     local sources = LrApplication.activeCatalog():getActiveSources()
 
     local count = 0
     for _ in pairs(sources) do count = count + 1 end
     
     local searchDesc = {}
+    local photos
     if count == 1 then
-        local activeSource = sources[1]
-        if activeSource:type() == "LrCollectionSet" then
-            return activeSource:getPhotos()
-        elseif activeSource:type() == "LrFolder" then
-            local photos = activeSource:getPhotos(true)
-            local sortedPhotos = PhotoUtils:sortPhotos(photos)
-            return sortedPhotos
-        end
+        return sources[1]
+    else
+        return nil
     end
+end
+
+function PhotoUtils:getSelectedPhotos()
+    local activeSource = PhotoUtils:getSelectedSource()
+    local photos
+    if (activeSource:type() == "LrCollection") then
+        photos = activeSource:getPhotos()
+    elseif activeSource:type() == "LrFolder" then
+        photos = activeSource:getPhotos(true)
+    end
+    return PhotoUtils:sortPhotos(photos)
 end

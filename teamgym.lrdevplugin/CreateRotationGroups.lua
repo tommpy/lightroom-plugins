@@ -11,48 +11,22 @@ local LrBinding = import "LrBinding"
 local logger = LrLogger('teamgymlogger')
 logger:enable( "logfile" )
 
-local function groupByRotations(comp_type, teams)
-    local photos = PhotoUtils:getSelectedPhotos()
-    
-    local apps = {"Tumble", "Trampet"}
-
-    local groups = {}
-    for _, team in ipairs(teams) do
-        local teamApps = {}
-        for _, app in ipairs(apps) do
-            teamApps[app] = {}
-        end
-
-        groups[team] = teamApps
-    end
-
-    local order = TeamGymUtils:sortMicroGroups(teams)
-    local currentGroup = {}
-    local i = 1
-
-    for _, photo in ipairs(photos) do
-        logger:info(photo:getFormattedMetadata("fileName"))
-        table.insert(currentGroup, photo)
-
-        if(photo:getRawMetadata("rating") == 1) then
-            local team = order[i].team
-            local app = order[i].app
-            groups[team][app] = currentGroup
-            
-            logger:info("Create Group For " .. team .. "/" .. app)
-                
-            currentGroup = {}
-            i = i + 1
-        end
-    end
-
-    return groups
-end
-
 local function createCollections(groups, collection_name)
     local catalog = LrApplication.activeCatalog()
+    local activeSource = PhotoUtils:getSelectedSource()
 
-    local parent = catalog:createCollectionSet(collection_name)
+    local parent
+    if(activeSource:type() == "LrCollection") then
+        parent = activeSource:getParent()
+        if parent ~= nil and parent:getName() == "Grouped" then
+            parent = catalog:createCollectionSet(collection_name, parent:getParent())
+        else
+            parent = catalog:createCollectionSet(collection_name)
+        end
+    else
+        parent = catalog:createCollectionSet(collection_name)
+    end
+
     for team, apps in pairs(groups) do
         local teamCollection = catalog:createCollectionSet(team, parent)
 
@@ -87,7 +61,7 @@ local function showDialog(context)
     local f = LrView.osFactory()
     local properties = LrBinding.makePropertyTable(context)
     
-    properties.collection_name = "Sorted"
+    properties.collection_name = PhotoUtils:getSelectedSource():getName()
     properties.comp_type = "micro"
     properties.team1 = ""
     properties.team2 = ""
@@ -176,14 +150,52 @@ local function showDialog(context)
     }
 end
 
+local function groupByRotations(context)
+    local photos = PhotoUtils:getSelectedPhotos()
+    local params = showDialog(context)
+    
+    local apps = {"Tumble", "Trampet"}
+
+    local groups = {}
+    for _, team in ipairs(params.teams) do
+        local teamApps = {}
+        for _, app in ipairs(apps) do
+            teamApps[app] = {}
+        end
+
+        groups[team] = teamApps
+    end
+
+    local order = TeamGymUtils:sortMicroGroups(params.teams)
+    local currentGroup = {}
+    local i = 1
+
+    for _, photo in ipairs(photos) do
+        logger:info(photo:getFormattedMetadata("fileName"))
+        table.insert(currentGroup, photo)
+
+        if(photo:getRawMetadata("rating") == 1) then
+            local team = order[i].team
+            local app = order[i].app
+            groups[team][app] = currentGroup
+            
+            logger:info("Create Group For " .. team .. "/" .. app)
+                
+            currentGroup = {}
+            i = i + 1
+        end
+    end
+
+    createCollections(groups, params.collection_name)
+    return groups
+end
+
 local function doCreate()
     LrTasks.startAsyncTask(function ()
         LrApplication.activeCatalog():withWriteAccessDo(
         "Create Rotations",
         function (context)
-            local params = showDialog(context)
-            local groups = groupByRotations(params.comp_type, params.teams)
-            createCollections(groups, params.collection_name)
+            groupByRotations(context)
         end,
         {
             timeout = 5
