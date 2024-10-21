@@ -49,12 +49,12 @@ local function searchCriteria(competition, phase, age, section, apparatus, club,
             operation = "==",
             value = club
         },
-		{
-			criteria = "sdktext:com.teamgymphotos.teamgym.Competition",
-			operation = "all",
-			value = competition,
-			value2 = "",
-		},
+		-- {
+		-- 	criteria = "sdktext:com.teamgymphotos.teamgym.Competition",
+		-- 	operation = "all",
+		-- 	value = competition,
+		-- 	value2 = "",
+		-- },
 		{
 			criteria = "sdk:com.teamgymphotos.teamgym.Nationality",
             operation = "==",
@@ -85,16 +85,19 @@ local function createSmartCollection(data)
     LrApplication.activeCatalog():createSmartCollection(data.name, criteria, data.root, true)
 end
 
-local function nations()
+local function nations(settings)
     local nationGroups = {}
     for age, _ in pairs(findAttributes("Age")) do
         for section, _ in pairs(findAttributes("Section")) do
             for nationality, _ in pairs(findAttributes("Nationality")) do
-                table.insert(nationGroups, {
-                    nationality = nationality,
-                    age = age,
-                    section = section
-                })
+                if(settings.included_nations[nationality]) then
+                    table.insert(nationGroups, {
+                        nationality = nationality,
+                        age = age,
+                        section = section
+                    })
+                end
+                
             end
         end
     end
@@ -199,7 +202,7 @@ local function createSection(root, settings, phase, age, section, min_rating)
     
     if(settings.competition_type == "international") then
         local seenNationalities = {}
-        for _, team in pairs(nations()) do
+        for _, team in pairs(nations(settings)) do
             if(team.section == section and team.age==age) then
                 if seenNationalities[team.nationality] == nil then
                     createTeam(sectionSet, settings, phase, age, section, nil, team.nationality, min_rating)
@@ -218,8 +221,6 @@ local function createSection(root, settings, phase, age, section, min_rating)
             end
         end
     end
-    
-    
 
     createSmartCollection{
         competition = settings.competition,
@@ -376,19 +377,19 @@ end
 local function createRootFolder(settings)
     local root = LrApplication.activeCatalog():createCollectionSet(settings.collection_name, nil, true)
 
-    if(settings.sort_by_rating) then 
+    if(settings.group_by_rating) then 
         for _, rating in pairs(ratedGroups()) do
             local ratingGroup = LrApplication.activeCatalog():createCollectionSet(rating.title, root, true)
             createPhases(ratingGroup, settings, rating.min_rating)
         end
     else
-        createPhases(root, settings)
+        createPhases(root, settings, 3)
     end
 end
 
 local function teams(settings)
     if(settings.competition_type == "international") then
-        return nations()
+        return nations(settings)
     else
         return clubs()
     end
@@ -400,8 +401,30 @@ local function showDialog(context)
     
     properties.competition = ""
     properties.competition_type = "international"
-    properties.sort_by_rating = true
+    properties.group_by_rating = false
     properties.collection_name = ""
+    properties.included_nations = {}
+
+    local nationsOptions = {
+        title = "Include Nations",
+        fill_horizontal = 1
+    }
+    
+    for nation, _ in pairs(findAttributes("Nationality")) do
+        properties.included_nations[nation] = false
+        table.insert(nationsOptions,
+            f:view {
+                spacing = f:control_spacing(),
+                place = "horizontal",
+                f:checkbox {
+                    value = LrView.bind("included_nations."..nation)
+                },
+                f:static_text {
+                    title = nation
+                }
+            }
+        )
+    end
 
     local contents = f:view {
         bind_to_object = properties,
@@ -443,7 +466,7 @@ local function showDialog(context)
                 spacing = f:control_spacing(),
                 place = "horizontal",
                 f:checkbox {
-                    value = LrView.bind("sort_by_rating")
+                    value = LrView.bind("group_by_rating")
                 },
                 f:static_text {
                     title = "Sort by Rating"
@@ -451,6 +474,7 @@ local function showDialog(context)
             }
             
         },
+        f:group_box(nationsOptions)
     }
 
     local result = LrDialogs.presentModalDialog(
@@ -464,8 +488,9 @@ local function showDialog(context)
         local settings = {
             competition = properties.competition,
             competition_type = properties.competition_type,
-            sort_by_rating = properties.sort_by_rating,
+            group_by_rating = properties.group_by_rating,
             teams = teams(properties),
+            included_nations = properties.included_nations,
             collection_name = properties.collection_name
         }
         createRootFolder(settings)
