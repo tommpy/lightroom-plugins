@@ -84,7 +84,7 @@ return {
             searchable = true,
 			browsable = true,
             dataType = 'enum',
-            version = 2,
+            version = 4,
             values = {
                 {
                 value = Nil,
@@ -97,6 +97,10 @@ return {
                 {
                 value = 'PodiumTraining',
                 title = LOC "$$$/TeamGym/Fields/Phase/PodiumTraining=Podium Training",
+                },
+                {
+                value = 'Qualification',
+                title = LOC "$$$/TeamGym/Fields/Phase/Qualification=Qualification",
                 },
                 {
                 value = 'Competition',
@@ -113,6 +117,10 @@ return {
                 {
                 value = 'Banquet',
                 title = LOC "$$$/TeamGym/Fields/Phase/Banquet=Banquet",
+                },
+                {
+                value = 'OpeningCeremony',
+                title = LOC "$$$/TeamGym/Fields/Phase/Opening Ceremony=Opening Ceremony",
                 }
             }
         },
@@ -156,6 +164,64 @@ return {
                 value = 'Scarborough',
                 title = LOC "$$$/TeamGym/Fields/Club/Scarborough=Scarborough",
                 },
+            }
+        },
+        {
+            id = 'Nationality',
+            title = LOC "$$$/TeamGym/Fields/Nationality=Nationality",
+            searchable = true,
+			browsable = true,
+            dataType = 'enum',
+            version = 1,
+            values = {
+                {
+                value = Nil,
+                title = LOC "$$$/TeamGym/Fields/Club/Unset=Unset",
+                },
+                {
+                value = 'Great Britain',
+                title = LOC "$$$/TeamGym/Fields/Club/Great Britain=Great Britain",
+                },
+                {
+                value = 'Denmark',
+                title = LOC "$$$/TeamGym/Fields/Club/Denmark=Denmark",
+                },
+                {
+                value = 'Portugal',
+                title = LOC "$$$/TeamGym/Fields/Club/Portugal=Portugal",
+                },
+                {
+                value = 'Estonia',
+                title = LOC "$$$/TeamGym/Fields/Club/Estonia=Estonia",
+                },
+                {
+                value = 'Norway',
+                title = LOC "$$$/TeamGym/Fields/Club/Norway=Norway",
+                },
+                {
+                value = 'Sweden',
+                title = LOC "$$$/TeamGym/Fields/Club/Sweden=Sweden",
+                },
+                {
+                value = 'Italy',
+                title = LOC "$$$/TeamGym/Fields/Club/Italy=Italy",
+                },
+                {
+                value = 'Azerbaijan',
+                title = LOC "$$$/TeamGym/Fields/Club/Azerbaijan=Azerbaijan",
+                },
+                {
+                value = 'Iceland',
+                title = LOC "$$$/TeamGym/Fields/Club/Iceland=Iceland",
+                },
+                {
+                value = 'Luxemburg',
+                title = LOC "$$$/TeamGym/Fields/Club/Luxemburg=Luxemburg",
+                },
+                {
+                value = 'Czech',
+                title = LOC "$$$/TeamGym/Fields/Club/Czech=Czech",
+                }
             }
         },
     },
