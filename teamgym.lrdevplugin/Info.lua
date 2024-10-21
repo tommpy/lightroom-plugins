@@ -21,6 +21,10 @@ return {
         {
             title = 'Create Rotation Groups',
             file = 'CreateRotationGroups.lua'
+        },
+        {
+            title = 'Delete Collection By Name',
+            file = 'DeleteCollectionByName.lua'
         }
     }
 }
